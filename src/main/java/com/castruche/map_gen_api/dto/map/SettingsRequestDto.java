@@ -1,10 +1,8 @@
 package com.castruche.map_gen_api.dto.map;
 
-
-import com.castruche.map_gen_api.dto.AbstractDto;
 import com.castruche.map_gen_api.enums.MapDistanceUnit;
 
-public class MapDto extends AbstractDto {
+public class SettingsRequestDto {
 
     private Double height;
     private Double width;
@@ -25,7 +23,6 @@ public class MapDto extends AbstractDto {
     public void setWidth(Double width) {
         this.width = width;
     }
-
 
     public MapDistanceUnit getUnit() {
         return unit;
