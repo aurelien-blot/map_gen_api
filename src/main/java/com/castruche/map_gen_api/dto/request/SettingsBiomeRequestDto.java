@@ -7,6 +7,7 @@ public class SettingsBiomeRequestDto {
     private Long biomeId;
     private Double percentage;
     private Long pixelTotal;
+    private Double treshold;
 
     public Long getBiomeId() {
         return biomeId;
@@ -30,5 +31,13 @@ public class SettingsBiomeRequestDto {
 
     public void setPixelTotal(Long pixelTotal) {
         this.pixelTotal = pixelTotal;
+    }
+
+    public Double getTreshold() {
+        return treshold;
+    }
+
+    public void setTreshold(Double treshold) {
+        this.treshold = treshold;
     }
 }

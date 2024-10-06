@@ -7,7 +7,7 @@ public class MapDto extends AbstractDto {
 
     private Long heightPx;
     private Long widthPx;
-    private String [][] map;
+    private BiomeDto [][] map;
 
     public Long getHeightPx() {
         return heightPx;
@@ -25,11 +25,11 @@ public class MapDto extends AbstractDto {
         this.widthPx = widthPx;
     }
 
-    public String[][] getMap() {
+    public BiomeDto[][] getMap() {
         return map;
     }
 
-    public void setMap(String[][] map) {
+    public void setMap(BiomeDto[][] map) {
         this.map = map;
     }
 }

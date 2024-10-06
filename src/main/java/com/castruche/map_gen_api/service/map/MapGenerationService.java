@@ -4,16 +4,14 @@ import com.castruche.map_gen_api.dto.map.BiomeDto;
 import com.castruche.map_gen_api.dto.map.MapDto;
 import com.castruche.map_gen_api.dto.request.SettingsBiomeRequestDto;
 import com.castruche.map_gen_api.dto.request.SettingsRequestDto;
+import com.castruche.map_gen_api.dto.util.noise.PerlinNoise;
 import com.castruche.map_gen_api.service.util.MathService;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class MapGenerationService  {
@@ -37,7 +35,7 @@ public class MapGenerationService  {
     }
 
     private List<SettingsBiomeRequestDto> generateSettingsBiomeListForTest() {
-        double[] percents = {0D, 0D, 50D, 50D};
+        double[] percents = {0D, 0D, 50D, 20D};
 
         List<SettingsBiomeRequestDto> list = new ArrayList<>();
 
@@ -64,7 +62,7 @@ public class MapGenerationService  {
         return list;
     }
 
-    private String [][] fillMapWithBiomes(SettingsRequestDto settingsRequestDto) {
+    private BiomeDto [][] fillMapWithBiomes(SettingsRequestDto settingsRequestDto) {
         if(settingsRequestDto==null || !settingsRequestDto.isValid()){
             throw new IllegalArgumentException("Invalid settings");
         }
@@ -74,7 +72,8 @@ public class MapGenerationService  {
         List<BiomeDto> biomeList = biomeService.selectDtoByIdIn(biomesId);
         HashMap<Long, BiomeDto> biomeMap = biomeList.stream().collect(HashMap::new, (m, b) -> m.put(b.getId(), b), HashMap::putAll);
 
-        String [][] map =randomBiomeGeneration(settingsRequestDto, biomeMap);
+        //BiomeDto [][] map =randomBiomeGeneration(settingsRequestDto, biomeMap);
+        BiomeDto [][] map =perlinBiomeGeneration(settingsRequestDto, biomeMap);
 
         return map;
     }
@@ -98,7 +97,17 @@ public class MapGenerationService  {
         }
     }
 
-    private  String [][] randomBiomeGeneration(SettingsRequestDto settingsRequestDto, HashMap<Long, BiomeDto> biomeMap){
+    private void fillEmptyPixels(Double totalPercentCovered,  List<SettingsBiomeRequestDto> settingsBiomeList) {
+        if(100-totalPercentCovered > 0){
+            BiomeDto emptyBiome = biomeService.findByTechnicalName("ocean");
+            SettingsBiomeRequestDto settingsBiomeRequestDto = new SettingsBiomeRequestDto();
+            settingsBiomeRequestDto.setBiomeId(emptyBiome.getId());
+            settingsBiomeRequestDto.setTreshold(100-totalPercentCovered);
+            settingsBiomeList.add(settingsBiomeRequestDto);
+        }
+    }
+
+    private  BiomeDto [][] randomBiomeGeneration(SettingsRequestDto settingsRequestDto, HashMap<Long, BiomeDto> biomeMap){
         List<BiomeDto> biomePixelList = new ArrayList<>();
         settingsRequestDto.getSettingsBiomeList().forEach(settingsBiomeRequestDto -> {
             if(settingsBiomeRequestDto.getBiomeId()==null || settingsBiomeRequestDto.getPercentage() == null || settingsBiomeRequestDto.getPercentage() <=0){
@@ -112,16 +121,78 @@ public class MapGenerationService  {
         fillEmptyPixels(settingsRequestDto.getTotalPixels(), biomePixelList);
 
         Collections.shuffle(biomePixelList);
-        String [][] map= new String[settingsRequestDto.getHeightPx().intValue()][settingsRequestDto.getWidthPx().intValue()];
+        BiomeDto [][] map= new BiomeDto[settingsRequestDto.getHeightPx().intValue()][settingsRequestDto.getWidthPx().intValue()];
 
         int index = 0;
         for (int y = 0; y < settingsRequestDto.getWidthPx(); y++) {
             for (int x = 0; x < settingsRequestDto.getHeightPx(); x++) {
-                map[x][y] = biomePixelList.get(index++).getColor();
+                map[x][y] = biomePixelList.get(index++);
             }
         }
         return map;
     }
 
+    private BiomeDto [][] perlinBiomeGeneration(SettingsRequestDto settingsRequestDto, HashMap<Long, BiomeDto> biomeMap){
+        int width = settingsRequestDto.getWidthPx().intValue();
+        int height = settingsRequestDto.getHeightPx().intValue();
+
+        double scale = 0.1; // Ajuste ce paramètre pour changer la taille des biomes
+        long seed = new Random().nextLong();
+
+        // Générer la carte de bruit
+        PerlinNoise noise = new PerlinNoise(seed);
+        double[][] noiseMap = new double[width][height];
+        List<Double> values = new ArrayList<>();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double value = noise.noise(x * scale, y * scale);
+                value = (value + 1) / 2; // Normaliser entre 0 et 1
+                noiseMap[x][y] = value;
+                values.add(value);
+            }
+        }
+
+        // Trier les valeurs de bruit
+        Collections.sort(values);
+
+        // Déterminer les seuils
+        int totalPixels = width * height;
+
+        double totalPercentCovered = 0;
+        List<SettingsBiomeRequestDto> settingsBiomeList = new ArrayList<>();
+        for(SettingsBiomeRequestDto settingsBiomeRequestDto : settingsRequestDto.getSettingsBiomeList()){
+            if(settingsBiomeRequestDto.getBiomeId()==null || settingsBiomeRequestDto.getPercentage() == null || settingsBiomeRequestDto.getPercentage() <=0){
+                continue;
+            }
+            double newValue = settingsBiomeRequestDto.getPercentage() / 100;
+            totalPercentCovered += newValue;
+            double threshold = values.get((int)(totalPixels * totalPercentCovered)-1);
+            settingsBiomeRequestDto.setTreshold(threshold);
+            settingsBiomeList.add(settingsBiomeRequestDto);
+
+        }
+        // On retrie la liste pour avoir les seuils dans l'ordre croissant
+        settingsBiomeList.sort(Comparator.comparingDouble(SettingsBiomeRequestDto::getTreshold));
+
+        fillEmptyPixels(totalPercentCovered, settingsBiomeList);
+
+        // Créer la carte finale
+        BiomeDto[][] map = new BiomeDto[width][height];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double value = noiseMap[x][y];
+                for (SettingsBiomeRequestDto settingsBiomeRequestDto : settingsBiomeList) {
+                    if (value <= settingsBiomeRequestDto.getTreshold()) {
+                        map[x][y] = biomeMap.get(settingsBiomeRequestDto.getBiomeId());
+                        break;
+                    }
+                }
+            }
+        }
+
+        return map;
+    }
     
 }
