@@ -5,8 +5,10 @@ import com.castruche.map_gen_api.dto.util.ConnectedUserDto;
 import com.castruche.map_gen_api.entity.User;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class UserFormatter implements IFormatter<User, UserDto>{
+public class UserFormatter implements IFormatter<User, UserDto, UserDto>{
 
     @Override
     public UserDto entityToDto(User entity) {
@@ -24,6 +26,11 @@ public class UserFormatter implements IFormatter<User, UserDto>{
     }
 
     @Override
+    public UserDto entityToLightDto(User user) {
+        return null;
+    }
+
+    @Override
     public User dtoToEntity(UserDto dto) {
         User user = new User();
         user.setId(dto.getId());
@@ -32,6 +39,16 @@ public class UserFormatter implements IFormatter<User, UserDto>{
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         return user;
+    }
+
+    @Override
+    public List entityToLightDto(List list) {
+        return IFormatter.super.entityToLightDto(list);
+    }
+
+    @Override
+    public List<UserDto> entityToDto(List list) {
+        return IFormatter.super.entityToDto(list);
     }
 
     public ConnectedUserDto entityToConnectedUserDto(User entity) {

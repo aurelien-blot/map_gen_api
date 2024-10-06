@@ -1,8 +1,8 @@
 package com.castruche.map_gen_api.controller.map;
 
 import com.castruche.map_gen_api.dto.map.MapDto;
-import com.castruche.map_gen_api.dto.map.SettingsRequestDto;
-import com.castruche.map_gen_api.service.map.MapService;
+import com.castruche.map_gen_api.dto.request.SettingsRequestDto;
+import com.castruche.map_gen_api.service.map.MapGenerationService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,14 +14,14 @@ import static com.castruche.map_gen_api.controller.ConstantUrl.MAP;
 @RequestMapping(MAP)
 public class MapController {
 
-    private MapService mapService;
-    public MapController(MapService mapService) {
-        this.mapService = mapService;
+    private MapGenerationService mapGenerationService;
+    public MapController(MapGenerationService mapGenerationService) {
+        this.mapGenerationService = mapGenerationService;
     }
 
     @PostMapping()
     public MapDto generate(@RequestBody SettingsRequestDto settingsRequestDto) {
-        return mapService.generate(settingsRequestDto);
+        return mapGenerationService.generate(settingsRequestDto);
     }
 
 

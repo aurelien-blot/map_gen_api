@@ -5,8 +5,10 @@ import com.castruche.map_gen_api.entity.map.Map;
 import com.castruche.map_gen_api.formatter.IFormatter;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class MapFormatter implements IFormatter<Map, MapDto> {
+public class MapFormatter implements IFormatter<Map, MapDto, MapDto> {
 
     @Override
     public MapDto entityToDto(Map entity) {
@@ -20,10 +22,25 @@ public class MapFormatter implements IFormatter<Map, MapDto> {
     }
 
     @Override
+    public MapDto entityToLightDto(Map map) {
+        return null;
+    }
+
+    @Override
     public Map dtoToEntity(MapDto dto) {
         Map map = new Map();
         map.setId(dto.getId());
         return map;
     }
-    
+
+    @Override
+    public List<MapDto> entityToDto(List<Map> maps) {
+        return IFormatter.super.entityToDto(maps);
+    }
+
+    @Override
+    public List<MapDto> entityToLightDto(List<Map> maps) {
+        return IFormatter.super.entityToLightDto(maps);
+    }
+
 }

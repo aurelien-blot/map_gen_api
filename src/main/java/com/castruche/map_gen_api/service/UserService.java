@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService extends GenericService<User, UserDto>{
+public class UserService extends GenericService<User, UserDto, UserDto>{
 
     private static final Logger logger = LogManager.getLogger(UserService.class);
 

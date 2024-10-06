@@ -5,12 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public abstract class GenericService<ENTITY, DTO> {
+public abstract class GenericService<ENTITY, DTO, LIGHT_DTO> {
 
     private final JpaRepository<ENTITY, Long> repository;
-    private final IFormatter<ENTITY, DTO> formatter;
+    private final IFormatter<ENTITY, DTO, LIGHT_DTO> formatter;
 
-    public GenericService(JpaRepository<ENTITY, Long> repository, IFormatter<ENTITY, DTO> formatter) {
+    public GenericService(JpaRepository<ENTITY, Long> repository, IFormatter<ENTITY, DTO, LIGHT_DTO> formatter) {
         this.repository = repository;
         this.formatter = formatter;
     }
@@ -30,8 +30,23 @@ public abstract class GenericService<ENTITY, DTO> {
         return repository.findAll();
     }
 
+
     public List<DTO> getAllDto() {
         List<ENTITY> entities = this.getAll();
+        return formatter.entityToDto(entities);
+    }
+
+    public List<LIGHT_DTO> getAllDtoLight() {
+        List<ENTITY> entities = this.getAll();
+        return formatter.entityToLightDto(entities);
+    }
+
+    public List<ENTITY> selectByIdIn(List<Long> idList) {
+        return repository.findAllById(idList);
+    }
+
+    public List<DTO> selectDtoByIdIn(List<Long> idList) {
+        List<ENTITY> entities = this.selectByIdIn(idList);
         return formatter.entityToDto(entities);
     }
 

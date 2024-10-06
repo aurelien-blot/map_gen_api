@@ -2,36 +2,34 @@ package com.castruche.map_gen_api.dto.map;
 
 
 import com.castruche.map_gen_api.dto.AbstractDto;
-import com.castruche.map_gen_api.enums.MapDistanceUnit;
 
 public class MapDto extends AbstractDto {
 
-    private Double height;
-    private Double width;
-    private MapDistanceUnit unit;
+    private Long heightPx;
+    private Long widthPx;
+    private String [][] map;
 
-    public Double getHeight() {
-        return height;
+    public Long getHeightPx() {
+        return heightPx;
     }
 
-    public void setHeight(Double height) {
-        this.height = height;
+    public void setHeightPx(Long heightPx) {
+        this.heightPx = heightPx;
     }
 
-    public Double getWidth() {
-        return width;
+    public Long getWidthPx() {
+        return widthPx;
     }
 
-    public void setWidth(Double width) {
-        this.width = width;
+    public void setWidthPx(Long widthPx) {
+        this.widthPx = widthPx;
     }
 
-
-    public MapDistanceUnit getUnit() {
-        return unit;
+    public String[][] getMap() {
+        return map;
     }
 
-    public void setUnit(MapDistanceUnit unit) {
-        this.unit = unit;
+    public void setMap(String[][] map) {
+        this.map = map;
     }
 }
