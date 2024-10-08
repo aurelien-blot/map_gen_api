@@ -26,40 +26,11 @@ public class MapGenerationService  {
 
     @Transactional
     public MapDto generate(SettingsRequestDto settingsRequestDto) {
-        settingsRequestDto.setSettingsBiomeList(generateSettingsBiomeListForTest());
         MapDto map = new MapDto();
         map.setHeightPx(settingsRequestDto.getHeightPx());
         map.setWidthPx(settingsRequestDto.getWidthPx());
         map.setMap(fillMapWithBiomes(settingsRequestDto));
         return map;
-    }
-
-    private List<SettingsBiomeRequestDto> generateSettingsBiomeListForTest() {
-        double[] percents = {0D, 0D, 50D, 20D};
-
-        List<SettingsBiomeRequestDto> list = new ArrayList<>();
-
-        SettingsBiomeRequestDto settingsBiomeRequestDto = new SettingsBiomeRequestDto();
-        settingsBiomeRequestDto.setBiomeId(1L);
-        settingsBiomeRequestDto.setPercentage(percents[0]);
-        list.add(settingsBiomeRequestDto);
-
-        settingsBiomeRequestDto = new SettingsBiomeRequestDto();
-        settingsBiomeRequestDto.setBiomeId(2L);
-        settingsBiomeRequestDto.setPercentage(percents[1]);
-        list.add(settingsBiomeRequestDto);
-
-        settingsBiomeRequestDto = new SettingsBiomeRequestDto();
-        settingsBiomeRequestDto.setBiomeId(3L);
-        settingsBiomeRequestDto.setPercentage(percents[2]);
-        list.add(settingsBiomeRequestDto);
-
-        settingsBiomeRequestDto = new SettingsBiomeRequestDto();
-        settingsBiomeRequestDto.setBiomeId(4L);
-        settingsBiomeRequestDto.setPercentage(percents[3]);
-        list.add(settingsBiomeRequestDto);
-
-        return list;
     }
 
     private BiomeDto [][] fillMapWithBiomes(SettingsRequestDto settingsRequestDto) {
@@ -136,7 +107,7 @@ public class MapGenerationService  {
         int width = settingsRequestDto.getWidthPx().intValue();
         int height = settingsRequestDto.getHeightPx().intValue();
 
-        double scale = 0.1; // Ajuste ce paramètre pour changer la taille des biomes
+        double scale = 0.01; // Ajuste ce paramètre pour changer la taille des biomes
         long seed = new Random().nextLong();
 
         // Générer la carte de bruit
@@ -172,10 +143,11 @@ public class MapGenerationService  {
             settingsBiomeList.add(settingsBiomeRequestDto);
 
         }
+        fillEmptyPixels(totalPercentCovered, settingsBiomeList);
         // On retrie la liste pour avoir les seuils dans l'ordre croissant
         settingsBiomeList.sort(Comparator.comparingDouble(SettingsBiomeRequestDto::getTreshold));
 
-        fillEmptyPixels(totalPercentCovered, settingsBiomeList);
+
 
         // Créer la carte finale
         BiomeDto[][] map = new BiomeDto[width][height];

@@ -10,6 +10,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BiomeService extends GenericService<Biome, BiomeDto, BiomeLightDto> {
 
@@ -26,6 +28,12 @@ public class BiomeService extends GenericService<Biome, BiomeDto, BiomeLightDto>
     public BiomeDto findByTechnicalName(String technicalName) {
         Biome entity = biomeRepository.findByTechnicalName(technicalName);
         return biomeFormatter.entityToDto(entity);
+    }
+
+    public List<BiomeLightDto> getAllDtoLight() {
+        List<Biome> entities = this.getAll();
+        entities.sort((Biome b1, Biome b2) -> b1.getOrdre().compareTo(b2.getOrdre()));
+        return biomeFormatter.entityToLightDto(entities);
     }
 
     

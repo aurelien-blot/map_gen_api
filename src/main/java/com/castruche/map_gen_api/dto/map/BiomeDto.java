@@ -8,6 +8,8 @@ public class BiomeDto extends AbstractDto {
     private String name;
     private String color;
 
+    private Integer order;
+
     public String getTechnicalName() {
         return technicalName;
     }
@@ -30,5 +32,13 @@ public class BiomeDto extends AbstractDto {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
     }
 }

@@ -23,6 +23,7 @@ public class BiomeFormatter implements IFormatter<Biome, BiomeDto, BiomeLightDto
         biomeDto.setTechnicalName(entity.getTechnicalName());
         biomeDto.setName(entity.getName());
         biomeDto.setColor(entity.getColor());
+        biomeDto.setOrder(entity.getOrdre());
         return biomeDto;
     }
 
@@ -36,6 +37,7 @@ public class BiomeFormatter implements IFormatter<Biome, BiomeDto, BiomeLightDto
         biomeDto.setTechnicalName(entity.getTechnicalName());
         biomeDto.setName(entity.getName());
         biomeDto.setColor(entity.getColor());
+        biomeDto.setOrder(entity.getOrdre());
         return biomeDto;
     }
 

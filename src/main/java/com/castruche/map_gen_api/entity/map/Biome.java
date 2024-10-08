@@ -9,6 +9,7 @@ public class Biome extends AbstractEntity {
         private String technicalName;
         private String name;
         private String color;
+        private Integer ordre;
 
     public String getTechnicalName() {
         return technicalName;
@@ -32,5 +33,13 @@ public class Biome extends AbstractEntity {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Integer getOrdre() {
+        return ordre;
+    }
+
+    public void setOrdre(Integer ordre) {
+        this.ordre = ordre;
     }
 }
